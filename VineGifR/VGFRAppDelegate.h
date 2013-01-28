@@ -7,9 +7,15 @@
 //
 
 #import <Cocoa/Cocoa.h>
+#import "TFHpple.h"
 
 @interface VGFRAppDelegate : NSObject <NSApplicationDelegate>
 
 @property (assign) IBOutlet NSWindow *window;
+@property (assign) IBOutlet NSButton *gifitButton;
+@property (assign) IBOutlet NSTextField *urlField;
+@property (assign) IBOutlet NSTextField *statusLabel;
+
+-(IBAction)doGif:(id)sender;
 
 @end
