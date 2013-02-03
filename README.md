@@ -3,7 +3,7 @@ VineGifR
 
 A Mac app to turn Vine videos into gifs
 
-Download the full file here: [http://untypic.al/media/VineGifR.zip](http://untypic.al/media/VineGifR.zip)
+Download the (built) app here: [http://untypic.al/media/VineGifR.zip](http://untypic.al/media/VineGifR.zip)
 
 Thanks to...
 ========
