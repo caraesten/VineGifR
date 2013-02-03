@@ -15,6 +15,7 @@
 @property (assign) IBOutlet NSButton *gifitButton;
 @property (assign) IBOutlet NSTextField *urlField;
 @property (assign) IBOutlet NSTextField *statusLabel;
+@property (assign) IBOutlet NSSegmentedControl *qualitySelector;
 
 -(IBAction)doGif:(id)sender;
 

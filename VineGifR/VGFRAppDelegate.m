@@ -17,7 +17,7 @@
 
 @implementation VGFRAppDelegate
 
-@synthesize urlField,gifitButton, statusLabel;
+@synthesize urlField,gifitButton, statusLabel, qualitySelector;
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
 {
@@ -25,6 +25,7 @@
 }
 - (void) handleCleanup
 {
+    [qualitySelector setEnabled:YES];
     [gifitButton setEnabled:YES];
     [urlField setEditable:YES];
 }
@@ -32,7 +33,8 @@
 {
     [gifitButton setEnabled:NO];
     [urlField setEditable:NO];
-    NSURL *vineURL = [NSURL URLWithString:urlField.stringValue];
+    [qualitySelector setEnabled:NO];
+    NSURL *vineURL = [NSURL URLWithString:[urlField.stringValue stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]]];
     if (vineURL && vineURL.scheme && vineURL.host && [vineURL.host isEqualToString:@"vine.co"] ) {
         // Seems legit, get save location
         NSSavePanel *saveObj = [NSSavePanel savePanel];
@@ -85,12 +87,17 @@
     gen.requestedTimeToleranceBefore = kCMTimeZero;
     gen.appliesPreferredTrackTransform = YES;
     [statusLabel setStringValue:@"Extracting images"];
+    
+    NSInteger qualityOption = [qualitySelector selectedSegment];
+    
+    double secondIncrement = qualityOption == 0 ? 0.22 : 0.1;
+
     while (CMTimeCompare(currentTime, videoData.duration) < 0){
         CGImageRef img = [gen copyCGImageAtTime:currentTime actualTime:nil error:nil];
         NSSize tempSize = NSMakeSize(CGImageGetWidth(img), CGImageGetHeight(img));
         NSImage *fullImage = [[NSImage alloc] initWithCGImage:img size:tempSize];
         if (fullImage.size.height == 0 || fullImage.size.width == 0) {
-            seconds += 0.2;
+            seconds += secondIncrement;
             currentTime = CMTimeMakeWithSeconds(seconds, timeScale);
             continue;
         }
@@ -102,7 +109,7 @@
         [frameImage unlockFocus];
         [gifImages addObject:frameImage];
         gifSize = frameImage.size;
-        seconds += 0.2;
+        seconds += secondIncrement;
         currentTime = CMTimeMakeWithSeconds(seconds, timeScale);
         img = nil;
     }
@@ -110,7 +117,7 @@
     ANGifEncoder *enc = [[ANGifEncoder alloc] initWithOutputFile:[saveFile path] size:gifSize globalColorTable:nil];
     [enc addApplicationExtension:[[ANGifNetscapeAppExtension alloc] initWithRepeatCount:0xffff]];
     for (NSImage *img in gifImages){
-        [enc addImageFrame:[self imageFrameWithImage:img]];
+        [enc addImageFrame:[self imageFrameWithImage:img increment:secondIncrement]];
     }
     [enc closeFile];
     [statusLabel setStringValue:@"Done"];
@@ -118,11 +125,11 @@
     [self handleCleanup];
 }
 // Via Giraffe
-- (ANGifImageFrame *)imageFrameWithImage:(NSImage *)anImage  {
+- (ANGifImageFrame *)imageFrameWithImage:(NSImage *)anImage increment:(double) inc {
 	NSImage * scaledImage = anImage;
 	NSImagePixelSource * pixelSource = [[NSImagePixelSource alloc] initWithImage:scaledImage];
-	ANCutColorTable * colorTable = [[ANCutColorTable alloc] initWithTransparentFirst:YES pixelSource:pixelSource];
-	ANGifImageFrame * frame = [[ANGifImageFrame alloc] initWithPixelSource:pixelSource colorTable:colorTable delayTime:0.2];
+	ANCutColorTable * colorTable = [[ANCutColorTable alloc] initWithTransparentFirst:NO pixelSource:pixelSource];
+	ANGifImageFrame * frame = [[ANGifImageFrame alloc] initWithPixelSource:pixelSource colorTable:colorTable delayTime:inc];
 #if !__has_feature(objc_arc)
 	[colorTable release];
 	[pixelSource release];
