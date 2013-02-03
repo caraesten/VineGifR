@@ -5,12 +5,13 @@ A Mac app to turn Vine videos into gifs
 
 Download the (built) app here:
 
-Version 1.1: [http://untypic.al/media/VineGifR_v1_1.zip](http://untypic.al/media/VineGifR_v1_1.zip)
-*CHANGELOG:*
+**Version 1.1:** [http://untypic.al/media/VineGifR_v1_1.zip](http://untypic.al/media/VineGifR_v1_1.zip)
+
+**CHANGELOG:**
 - Added low and high quality options. Low will export a gif less than 2mb for Imgur, high has an increased frame rate and is just under 5mb.
 - Cleaned up URL handling, so you'll see fewer "this isn't a Vine URL" errors.
 
-Version 1.0: [http://untypic.al/media/VineGifR.zip](http://untypic.al/media/VineGifR.zip)
+**Version 1.0:** [http://untypic.al/media/VineGifR.zip](http://untypic.al/media/VineGifR.zip)
 
 Thanks to...
 ========
