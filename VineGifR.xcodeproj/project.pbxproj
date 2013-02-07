@@ -79,7 +79,7 @@
 		D6C66E2F16B601EE009E0D4F /* CoreMedia.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D6C66E2E16B601EE009E0D4F /* CoreMedia.framework */; };
 		D6C66E3516B629DA009E0D4F /* Credits.html in Resources */ = {isa = PBXBuildFile; fileRef = D6C66E3416B629DA009E0D4F /* Credits.html */; };
 		D6C66E3616B629DA009E0D4F /* Credits.html in Resources */ = {isa = PBXBuildFile; fileRef = D6C66E3416B629DA009E0D4F /* Credits.html */; };
-		E231039E16C3BCD000208FA2 /* ANGifRiffWaveAppExtension.m in Sources */ = {isa = PBXBuildFile; fileRef = E231039D16C3BCD000208FA2 /* ANGifRiffWaveAppExtension.m */; };
+		E23103A116C3E72500208FA2 /* ANGifRiffWaveAppExtension.m in Sources */ = {isa = PBXBuildFile; fileRef = E23103A016C3E72500208FA2 /* ANGifRiffWaveAppExtension.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -173,8 +173,8 @@
 		D6C66DE216B5FBD1009E0D4F /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
 		D6C66E2E16B601EE009E0D4F /* CoreMedia.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMedia.framework; path = System/Library/Frameworks/CoreMedia.framework; sourceTree = SDKROOT; };
 		D6C66E3416B629DA009E0D4F /* Credits.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = Credits.html; sourceTree = "<group>"; };
-		E231039C16C3BCD000208FA2 /* ANGifRiffWaveAppExtension.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ANGifRiffWaveAppExtension.h; path = ../../../ANGifRiffWaveAppExtension.h; sourceTree = "<group>"; };
-		E231039D16C3BCD000208FA2 /* ANGifRiffWaveAppExtension.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ANGifRiffWaveAppExtension.m; path = ../../../ANGifRiffWaveAppExtension.m; sourceTree = "<group>"; };
+		E231039F16C3E70300208FA2 /* ANGifRiffWaveAppExtension.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ANGifRiffWaveAppExtension.h; sourceTree = "<group>"; };
+		E23103A016C3E72500208FA2 /* ANGifRiffWaveAppExtension.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ANGifRiffWaveAppExtension.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -225,8 +225,8 @@
 		D676919D16B71BAD001E40D3 /* App Extensions */ = {
 			isa = PBXGroup;
 			children = (
-				E231039C16C3BCD000208FA2 /* ANGifRiffWaveAppExtension.h */,
-				E231039D16C3BCD000208FA2 /* ANGifRiffWaveAppExtension.m */,
+				E231039F16C3E70300208FA2 /* ANGifRiffWaveAppExtension.h */,
+				E23103A016C3E72500208FA2 /* ANGifRiffWaveAppExtension.m */,
 				D676919E16B71BAD001E40D3 /* ANGifAppExtension.h */,
 				D676919F16B71BAD001E40D3 /* ANGifAppExtension.m */,
 				D67691A016B71BAD001E40D3 /* ANGifNetscapeAppExtension.h */,
@@ -586,7 +586,7 @@
 				D67691FF16B71BAE001E40D3 /* BitmapCropManipulator.m in Sources */,
 				D676920116B71BAE001E40D3 /* BitmapRotationManipulator.m in Sources */,
 				D676920316B71BAE001E40D3 /* BitmapScaleManipulator.m in Sources */,
-				E231039E16C3BCD000208FA2 /* ANGifRiffWaveAppExtension.m in Sources */,
+				E23103A116C3E72500208FA2 /* ANGifRiffWaveAppExtension.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
