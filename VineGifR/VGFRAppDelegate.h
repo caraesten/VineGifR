@@ -16,6 +16,7 @@
 @property (assign) IBOutlet NSTextField *urlField;
 @property (assign) IBOutlet NSTextField *statusLabel;
 @property (assign) IBOutlet NSSegmentedControl *qualitySelector;
+@property (assign) IBOutlet NSButton *soundCheckbox;
 
 -(IBAction)doGif:(id)sender;
 
