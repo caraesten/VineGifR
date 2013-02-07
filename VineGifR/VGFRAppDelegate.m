@@ -12,12 +12,18 @@
 #import "ANCutColorTable.h"
 #import "NSImagePixelSource.h"
 #import "ANGifNetscapeAppExtension.h"
+#import "ANGifRiffWaveAppExtension.h"
 #define kExportSampleCount 2056
 #define kDelayTime 0.2
 
+#define waveHeader      "RIFF    WAVE" \
+                        "fmt \x10\x0\x0\x0" \
+                        "\x1\x0\x1\x0\x80\x3e\x0\x0\x0\x7D\x0\x0\x2\x0\x10\x0" \
+                        "data    "
+
 @implementation VGFRAppDelegate
 
-@synthesize urlField,gifitButton, statusLabel, qualitySelector;
+@synthesize urlField,gifitButton, statusLabel, qualitySelector, soundCheckbox;
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
 {
@@ -58,6 +64,70 @@
     }
     
 }
+- (NSData *)getWaveDataFromAVAsset:(AVAsset *) asset
+{
+    // load first audio track, exit if asset contain no audio tracks
+    NSArray *audioTracks = [asset tracksWithMediaType:AVMediaTypeAudio];
+    if ([audioTracks count] == 0)
+        return nil;
+    AVAssetTrack *audioTrack = [audioTracks objectAtIndex:0];
+    
+    // create asset reader
+    NSError *assetError = nil;
+    AVAssetReader *assetReader = [AVAssetReader assetReaderWithAsset:asset error:&assetError];
+    if (assetError) {
+        NSLog(@"Asset error: %@", assetError);
+        return nil;
+    }
+    
+    // riff wave format
+    // linear PCM, 16000hz, solo, 16 bits per sample, little endian (default for riff)
+    NSDictionary *waveAudioSettings = [NSDictionary dictionaryWithObjectsAndKeys:
+                                       [NSNumber numberWithUnsignedInt:kAudioFormatLinearPCM], AVFormatIDKey,
+                                       [NSNumber numberWithFloat:16000.0], AVSampleRateKey,
+                                       [NSNumber numberWithInt:1], AVNumberOfChannelsKey,
+                                       [NSNumber numberWithInt:16], AVLinearPCMBitDepthKey,
+                                       [NSNumber numberWithBool:NO], AVLinearPCMIsFloatKey,
+                                       [NSNumber numberWithBool:NO], AVLinearPCMIsBigEndianKey,
+                                       nil];
+    AVAssetReaderOutput *output = [AVAssetReaderTrackOutput assetReaderTrackOutputWithTrack:audioTrack
+                                                                             outputSettings:waveAudioSettings];
+    if (! [assetReader canAddOutput:output]) {
+        NSLog(@"Can't add output");
+    }
+    [assetReader addOutput:output];
+   
+    NSMutableData * waveData = [NSMutableData dataWithBytes:waveHeader length:44];
+    
+    [assetReader startReading];
+    CMSampleBufferRef sampleBuffer = [output copyNextSampleBuffer];
+    while (sampleBuffer) {
+        AudioBufferList  audioBufferList;
+        CMBlockBufferRef blockBuffer;
+        
+        CMSampleBufferGetAudioBufferListWithRetainedBlockBuffer(sampleBuffer,
+                                                                NULL, &audioBufferList,
+                                                                sizeof(audioBufferList),
+                                                                NULL, NULL, 0,
+                                                                &blockBuffer);
+        
+        for (int y = 0; y < audioBufferList.mNumberBuffers; y++) {
+            AudioBuffer audioBuffer = audioBufferList.mBuffers[y];
+            [waveData appendBytes:audioBuffer.mData length:audioBuffer.mDataByteSize];
+        }
+        
+        sampleBuffer = [output copyNextSampleBuffer];
+    }
+    
+    // write file size to header
+    UInt32 fileLength = (unsigned int) [waveData length] - 8;
+    [waveData replaceBytesInRange:NSMakeRange(4, 4) withBytes:&fileLength];
+    UInt32 dataLength = fileLength - 36;
+    [waveData replaceBytesInRange:NSMakeRange(40, 4) withBytes:&dataLength];
+    
+    // [waveData writeToFile:@"/Users/dp/Documents/test.wav" atomically:YES];
+	return [NSData dataWithData:waveData];
+}
 
 - (void)renderGifWithOptions:(NSDictionary *) options
 {
@@ -75,8 +145,18 @@
     element = [[element children] objectAtIndex:0];
     NSString *videoURLString =  [element objectForKey:@"src"];
     NSURL *videoURL = [NSURL URLWithString:videoURLString];
+
+    // load file to temp folder
+    // extracting stream works only with local assets
     [statusLabel setStringValue:@"Downloading video"];
-    AVURLAsset *videoData = [AVURLAsset URLAssetWithURL:videoURL options:nil];
+    NSData *data = [NSData dataWithContentsOfURL:videoURL];
+    // TODO: could fail if more than one copy would launched
+    NSString *localFilePath = [NSTemporaryDirectory() stringByAppendingPathComponent:@"vinegifer.mp4"];
+    [data writeToFile:localFilePath atomically:YES];
+    NSURL *localVideoUrl = [NSURL fileURLWithPath:localFilePath];
+    
+    AVURLAsset *videoData = [AVURLAsset URLAssetWithURL:localVideoUrl options:nil];
+    
     NSMutableArray *gifImages = [[NSMutableArray alloc] init];
     int32_t timeScale = 24;
     Float64 seconds = 0.0;
@@ -113,9 +193,21 @@
         currentTime = CMTimeMakeWithSeconds(seconds, timeScale);
         img = nil;
     }
+    
+    NSData * waveData;
+    if ([soundCheckbox state]) {
+        [statusLabel setStringValue:@"Extracting sound"];
+        waveData = [self getWaveDataFromAVAsset:videoData];
+    }
+    
     [statusLabel setStringValue:@"Saving gif"];
     ANGifEncoder *enc = [[ANGifEncoder alloc] initWithOutputFile:[saveFile path] size:gifSize globalColorTable:nil];
     [enc addApplicationExtension:[[ANGifNetscapeAppExtension alloc] initWithRepeatCount:0xffff]];
+    
+    if (waveData) {
+        [enc addApplicationExtension:[[ANGifRiffWaveAppExtension alloc] initWithWaveData:waveData]];
+    }
+    
     for (NSImage *img in gifImages){
         [enc addImageFrame:[self imageFrameWithImage:img increment:secondIncrement]];
     }
